@@ -1,0 +1,79 @@
+services:
+  # Web service
+  - type: web
+    name: youtube-context-engine
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      # App settings
+      - key: APP_NAME
+        value: YouTube Context Engine
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: false
+
+      # Server (Render provides PORT automatically)
+      - key: HOST
+        value: 0.0.0.0
+
+      # Supabase (set these as secret in Render Dashboard)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+
+      # Google APIs (set these as secret in Render Dashboard)
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+      # Google OAuth (set these as secret in Render Dashboard)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false  # You'll update this after deployment with your Render URL
+
+      # Stripe (set these as secret in Render Dashboard)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_PRICE_ID_PRO
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false  # You'll get a new one after configuring webhook
+
+      # Gemini model
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash-exp
+
+      # File storage
+      - key: UPLOAD_DIR
+        value: static/uploads
+      - key: DATA_DIR
+        value: data
+      - key: CSV_FILE
+        value: data/competitor_data.csv
+
+      # Processing settings
+      - key: MAX_CHANNELS
+        value: 10
+      - key: VIDEOS_PER_CHANNEL
+        value: 2
+      - key: MAX_WORKERS
+        value: 10
+      - key: REQUEST_TIMEOUT
+        value: 10
+      - key: SHORTS_DURATION_THRESHOLD
+        value: 60
+
+    # Health check
+    healthCheckPath: /health

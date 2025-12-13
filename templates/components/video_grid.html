@@ -1,0 +1,183 @@
+<!-- Video Grid Results -->
+<div id="results-wrapper">
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold mb-1">Your Video in Context</h2>
+                <p class="text-sm text-yt-text-secondary">
+                    {{ video_count }} videos • Your video is mixed in naturally for a fair comparison
+                </p>
+            </div>
+            <button
+                hx-post="/shuffle"
+                hx-target="#results-wrapper"
+                hx-indicator="#shuffle-spinner"
+                hx-vals='{"session_id": "{{ session_id }}"}'
+                class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Shuffle</span>
+                <svg id="shuffle-spinner" class="htmx-indicator spinner w-4 h-4" viewBox="0 0 24 24"></svg>
+            </button>
+        </div>
+
+        <!-- Video Title Editor -->
+        <div class="bg-yt-card rounded-lg p-4 border border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <label class="text-xs text-yt-text-secondary mb-1 block">Your Video Title:</label>
+                    <div id="title-display-{{ session_id }}" class="group">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-base font-medium text-yt-text" id="title-text-{{ session_id }}">
+                                {% for video in videos %}
+                                    {% if video.is_user_video %}{{ video.title }}{% endif %}
+                                {% endfor %}
+                            </span>
+                            <button
+                                onclick="showTitleEditor('{{ session_id }}')"
+                                class="opacity-0 group-hover:opacity-100 transition-opacity text-yt-accent hover:text-blue-400"
+                                title="Edit title"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="title-editor-{{ session_id }}" style="display: none;">
+                        <form
+                            hx-patch="/test/{{ session_id }}/title"
+                            hx-target="#title-editor-{{ session_id }}"
+                            hx-swap="none"
+                            class="flex items-center space-x-2"
+                        >
+                            <input
+                                type="text"
+                                name="title"
+                                id="title-input-{{ session_id }}"
+                                value="{% for video in videos %}{% if video.is_user_video %}{{ video.title }}{% endif %}{% endfor %}"
+                                maxlength="100"
+                                class="flex-1 bg-yt-bg border border-gray-600 rounded px-3 py-1.5 text-sm text-yt-text focus:outline-none focus:ring-2 focus:ring-yt-accent"
+                            />
+                            <button
+                                type="submit"
+                                class="bg-yt-accent hover:bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
+                            >
+                                Save
+                            </button>
+                            <button
+                                type="button"
+                                onclick="hideTitleEditor('{{ session_id }}')"
+                                class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showTitleEditor(sessionId) {
+        document.getElementById('title-display-' + sessionId).style.display = 'none';
+        document.getElementById('title-editor-' + sessionId).style.display = 'block';
+        document.getElementById('title-input-' + sessionId).focus();
+        document.getElementById('title-input-' + sessionId).select();
+    }
+
+    function hideTitleEditor(sessionId) {
+        document.getElementById('title-display-' + sessionId).style.display = 'block';
+        document.getElementById('title-editor-' + sessionId).style.display = 'none';
+    }
+
+    // Handle successful title update
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.pathInfo.requestPath.includes('/title')) {
+            if (event.detail.successful) {
+                const response = JSON.parse(event.detail.xhr.response);
+                const sessionId = event.detail.pathInfo.requestPath.split('/')[2];
+                document.getElementById('title-text-' + sessionId).textContent = response.title;
+                hideTitleEditor(sessionId);
+
+                // Show success message
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                notification.textContent = '✓ Title updated successfully';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            }
+        }
+    });
+    </script>
+
+    <div class="grid grid-cols-3 gap-6">
+    {% for video in videos %}
+    <div class="group cursor-pointer">
+        <!-- Thumbnail Container -->
+        <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-800 mb-4">
+            <a href="{{ video.video_url }}" target="_blank" rel="noopener noreferrer">
+                <img
+                    src="{{ video.thumbnail_url }}"
+                    alt="{{ video.title }}"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
+                    onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23666%22%3E%3Cpath d=%22M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12z%22/%3E%3C/svg%3E'; this.parentElement.parentElement.style.backgroundColor='#1e1e1e';"
+                    referrerpolicy="no-referrer"
+                />
+                <!-- Duration Badge -->
+                {% if video.duration %}
+                <span class="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-sm font-semibold px-2 py-1 rounded">
+                    {{ video.duration }}
+                </span>
+                {% endif %}
+            </a>
+        </div>
+
+        <!-- Video Metadata -->
+        <div class="flex space-x-3">
+            <!-- Channel Avatar -->
+            <div class="flex-shrink-0">
+                {% if video.channel_avatar %}
+                <img
+                    src="{{ video.channel_avatar }}"
+                    alt="{{ video.channel_name }}"
+                    class="w-10 h-10 rounded-full bg-gray-700"
+                />
+                {% else %}
+                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-base font-bold">
+                    {{ video.channel_name[0]|upper }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Video Info -->
+            <div class="flex-1 min-w-0">
+                <h3 class="font-medium text-base leading-tight line-clamp-2 mb-1 group-hover:text-yt-accent transition-colors">
+                    <a href="{{ video.video_url }}" target="_blank" rel="noopener noreferrer">
+                        {{ video.title }}
+                    </a>
+                </h3>
+                <p class="text-sm text-yt-text-secondary">{{ video.channel_name }}</p>
+                <p class="text-sm text-yt-text-secondary">
+                    {{ video.view_text }} • {{ video.time_ago }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+</div>
+
+<!-- Utility Classes for line-clamp -->
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>

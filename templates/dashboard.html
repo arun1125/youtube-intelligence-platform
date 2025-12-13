@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - YouTube Context Engine{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            <p class="text-yt-text-secondary mt-1">Welcome back, {{ user.full_name or user.email }}</p>
+        </div>
+        <a href="/auth/logout" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors">
+            Sign Out
+        </a>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Tests Used -->
+        <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yt-text-secondary text-sm">Tests This Month</p>
+                    <p class="text-3xl font-bold mt-2">
+                        {{ profile.tests_used_this_month }} / {{ profile.tests_limit }}
+                    </p>
+                    {% if profile.tests_used_this_month >= profile.tests_limit %}
+                    <p class="text-red-500 text-sm mt-2">Limit reached</p>
+                    {% else %}
+                    <p class="text-green-500 text-sm mt-2">{{ profile.tests_limit - profile.tests_used_this_month }} remaining</p>
+                    {% endif %}
+                </div>
+                <svg class="w-12 h-12 text-yt-accent opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Subscription -->
+        <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yt-text-secondary text-sm">Subscription</p>
+                    <p class="text-2xl font-bold mt-2 capitalize">
+                        {{ profile.subscription_tier }}
+                    </p>
+                    {% if profile.subscription_tier == 'free' %}
+                    <a href="/api/payment/upgrade" class="text-yt-accent text-sm mt-2 inline-block hover:underline">Upgrade to Pro →</a>
+                    {% else %}
+                    <p class="text-green-500 text-sm mt-2">Active</p>
+                    {% if profile.stripe_customer_id %}
+                    <a href="/api/payment/portal" class="text-yt-accent text-xs mt-1 inline-block hover:underline">Manage Subscription</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                <svg class="w-12 h-12 text-yellow-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- API Key Status -->
+        <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yt-text-secondary text-sm">API Key</p>
+                    {% if has_api_key %}
+                    <p class="text-2xl font-bold mt-2">Connected</p>
+                    <p class="text-green-500 text-sm mt-2">Unlimited tests</p>
+                    {% else %}
+                    <p class="text-2xl font-bold mt-2">Not Set</p>
+                    <button
+                        onclick="document.getElementById('api-key-modal').classList.remove('hidden')"
+                        class="text-yt-accent text-sm mt-2 hover:underline"
+                    >
+                        Add API Key →
+                    </button>
+                    {% endif %}
+                </div>
+                <svg class="w-12 h-12 text-green-500 opacity-20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+        <div class="flex gap-4">
+            <a href="/" class="px-6 py-3 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors">
+                Create New Test
+            </a>
+            {% if not has_api_key and profile.subscription_tier == 'free' %}
+            <button
+                onclick="document.getElementById('api-key-modal').classList.remove('hidden')"
+                class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+            >
+                Add API Key (Unlimited Tests)
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Tests -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <h2 class="text-xl font-bold mb-4">Recent Tests</h2>
+        {% if recent_tests %}
+        <div class="space-y-4">
+            {% for test in recent_tests %}
+            <a href="/test/{{ test.id }}" class="block bg-yt-bg rounded-lg p-4 border border-gray-800 hover:border-yt-accent transition-colors">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-medium">{{ test.video_title }}</h3>
+                        <p class="text-sm text-yt-text-secondary mt-1">{{ test.persona[:100] }}{% if test.persona|length > 100 %}...{% endif %}</p>
+                        <div class="flex items-center gap-4 mt-3 text-xs text-yt-text-secondary">
+                            <span>{{ test.created_at_formatted }}</span>
+                            <span>•</span>
+                            <span>{{ test.total_videos_fetched }} videos</span>
+                            <span>•</span>
+                            <span>{{ test.channels_discovered|length if test.channels_discovered else 0 }} channels</span>
+                        </div>
+                    </div>
+                    <div class="ml-4 px-4 py-2 bg-gray-800 rounded text-sm">
+                        View →
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-yt-text-secondary mt-4">No tests yet</p>
+            <a href="/" class="mt-4 inline-block px-6 py-2 bg-yt-accent hover:bg-blue-600 rounded-lg text-sm transition-colors">
+                Create Your First Test
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- API Key Modal -->
+<div id="api-key-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-yt-card rounded-lg p-8 max-w-md w-full mx-4 border border-gray-800">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold">Add Google API Key</h2>
+            <button
+                onclick="document.getElementById('api-key-modal').classList.add('hidden')"
+                class="text-yt-text-secondary hover:text-yt-text"
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <p class="text-yt-text-secondary mb-6">
+            Use your own Google API key to get unlimited thumbnail tests.
+            <a href="https://console.cloud.google.com/apis" target="_blank" class="text-yt-accent hover:underline">Get your key here</a>.
+        </p>
+
+        <form
+            hx-post="/api/user/api-key"
+            hx-swap="none"
+            hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+        >
+            <div class="mb-6">
+                <label for="api_key" class="block text-sm font-medium mb-2">Google API Key</label>
+                <input
+                    type="text"
+                    id="api_key"
+                    name="api_key"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="AIza..."
+                    required
+                >
+            </div>
+
+            <div class="flex gap-3">
+                <button
+                    type="submit"
+                    class="flex-1 px-4 py-2 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors"
+                >
+                    Save Key
+                </button>
+                <button
+                    type="button"
+                    onclick="document.getElementById('api-key-modal').classList.add('hidden')"
+                    class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

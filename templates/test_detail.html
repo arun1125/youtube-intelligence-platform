@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Test Results - YouTube Context Engine{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/dashboard" class="text-yt-accent hover:underline text-sm mb-4 inline-block">
+            ← Back to Dashboard
+        </a>
+        <h1 class="text-3xl font-bold text-yt-text mb-2">Test Results</h1>
+        <p class="text-yt-text-secondary">
+            Created {{ test.created_at_formatted }}
+        </p>
+    </div>
+
+    <!-- Test Metadata -->
+    <div class="bg-yt-card rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-yt-text mb-4">Test Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-yt-text-secondary text-sm">Persona/Niche</p>
+                <p class="text-yt-text font-medium">{{ test.persona }}</p>
+            </div>
+            <div>
+                <p class="text-yt-text-secondary text-sm">Your Video Title</p>
+                <p class="text-yt-text font-medium">{{ test.video_title }}</p>
+            </div>
+            <div>
+                <p class="text-yt-text-secondary text-sm">Total Videos Fetched</p>
+                <p class="text-yt-text font-medium">{{ test.total_videos_fetched }}</p>
+            </div>
+            <div>
+                <p class="text-yt-text-secondary text-sm">Channels Discovered</p>
+                <p class="text-yt-text font-medium">{{ test.channels_discovered|length if test.channels_discovered else 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Video -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-yt-text mb-4">Your Video</h2>
+        <div class="bg-yt-card rounded-lg p-4 inline-block">
+            <img
+                src="/{{ test.thumbnail_path }}"
+                alt="{{ test.video_title }}"
+                class="rounded-lg w-80 mb-2"
+            >
+            <p class="text-yt-text font-medium">{{ test.video_title }}</p>
+        </div>
+    </div>
+
+    <!-- Competitor Videos Grid -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-yt-text mb-4">
+            Competitor Context ({{ videos|length }} videos)
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {% for video in videos %}
+            <div class="bg-yt-card rounded-lg overflow-hidden hover:bg-yt-hover transition-colors">
+                <a href="https://youtube.com/watch?v={{ video.video_id }}" target="_blank">
+                    <div class="relative">
+                        <img
+                            src="{{ video.thumbnail_url }}"
+                            alt="{{ video.title }}"
+                            class="w-full aspect-video object-cover"
+                        >
+                        {% if video.duration_seconds %}
+                        <span class="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1 rounded">
+                            {{ video.duration_seconds|format_duration }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="p-2">
+                        <h3 class="text-sm font-medium text-yt-text line-clamp-2 mb-1">
+                            {{ video.title }}
+                        </h3>
+                        <p class="text-xs text-yt-text-secondary">{{ video.channel_name }}</p>
+                        {% if video.view_count %}
+                        <p class="text-xs text-yt-text-secondary">
+                            {{ video.view_count|format_view_count }} views
+                        </p>
+                        {% endif %}
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

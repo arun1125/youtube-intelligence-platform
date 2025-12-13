@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool)",
+      "Bash(find:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(env)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(python3 -c:*)",
+      "Bash(git init:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

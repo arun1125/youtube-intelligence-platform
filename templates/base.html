@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>{% block title %}YouTube Context Engine{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'yt-bg': '#0f0f0f',
+                        'yt-card': '#1e1e1e',
+                        'yt-hover': '#272727',
+                        'yt-text': '#f1f1f1',
+                        'yt-text-secondary': '#aaaaaa',
+                        'yt-accent': '#3ea6ff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts - Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Loading spinner */
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3ea6ff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f3f;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-yt-bg text-yt-text min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-yt-bg border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                    <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/>
+                    </svg>
+                    <h1 class="text-xl font-bold">Context Engine</h1>
+                </a>
+                <div class="flex items-center space-x-4">
+                    {% if user %}
+                    <!-- Authenticated user -->
+                    <a href="/dashboard" class="text-sm text-yt-text hover:text-yt-accent transition-colors">
+                        Dashboard
+                    </a>
+                    <div class="flex items-center space-x-2">
+                        {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" alt="Avatar" class="w-8 h-8 rounded-full">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-yt-accent flex items-center justify-center text-white text-sm font-semibold">
+                            {{ user.email[0].upper() if user.email else '?' }}
+                        </div>
+                        {% endif %}
+                        <span class="text-sm text-yt-text hidden md:block">{{ user.full_name or user.email }}</span>
+                    </div>
+                    <a href="/auth/logout" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors">
+                        Sign Out
+                    </a>
+                    {% else %}
+                    <!-- Unauthenticated -->
+                    <span class="text-sm text-yt-text-secondary hidden md:block">
+                        Test your thumbnails against real competition
+                    </span>
+                    <a href="/auth/login" class="px-4 py-2 bg-yt-accent hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors">
+                        Sign In
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-yt-text-secondary">
+            <p>YouTube Context Engine - Built with FastAPI, Tailwind CSS & HTMX</p>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

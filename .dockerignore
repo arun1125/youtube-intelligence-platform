@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Old code and test files
+old_code/
+test_*.py
+reports/
+
+# Data files (don't deploy local data)
+*.pkl
+*.csv
+data/*.csv
+
+# Uploads (don't deploy test uploads)
+static/uploads/*.png
+static/uploads/*.jpg
+static/uploads/*.JPG
+static/uploads/*.jpeg
+
+# Keep the .gitkeep files
+!static/uploads/.gitkeep
+!data/.gitkeep
+
+# Logs
+*.log
+
+# Database migrations (deploy separately)
+supabase/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
