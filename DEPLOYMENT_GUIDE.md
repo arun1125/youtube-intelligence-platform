@@ -231,13 +231,19 @@ Your Supabase database needs these migrations:
 2. Copy contents of `supabase/migrations/002_add_subscription_status.sql`
 3. Paste and click **"Run"**
 
-### 7.3 Add Increment Function
+### 7.3 Add Shotlist Tables
+
+1. Still in SQL Editor, click **"New query"**
+2. Copy contents of `supabase/migrations/003_add_shotlist_tables.sql`
+3. Paste and click **"Run"**
+
+### 7.4 Add Increment Function
 
 1. Still in SQL Editor, click **"New query"**
 2. Copy contents of `add_increment_function.sql`
 3. Paste and click **"Run"**
 
-### 7.4 Verify Tables Exist
+### 7.5 Verify Tables Exist
 
 Run this query to verify:
 ```sql
@@ -252,6 +258,9 @@ You should see:
 - `thumbnail_tests`
 - `test_videos`
 - `user_api_keys`
+- `production_projects`
+- `production_videos`
+- `production_shots`
 
 ---
 

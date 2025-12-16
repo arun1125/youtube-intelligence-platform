@@ -1,0 +1,53 @@
+<div data-shot-id="{{ shot.id }}" class="bg-yt-card border border-gray-800 rounded-xl p-4">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-3">
+        <div
+            class="text-xl font-bold text-yt-text"
+            onclick="editCell(this, '{{ shot.id }}', 'shot_type')"
+        >{{ shot.shot_type or 'Untitled Shot' }}</div>
+
+        <button
+            onclick="deleteShot('{{ shot.id }}', this.closest('[data-shot-id]'))"
+            class="text-gray-600 hover:text-red-500"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Description -->
+    {% if shot.shot_description %}
+    <div
+        class="text-yt-text-secondary text-sm mb-3"
+        onclick="editCell(this, '{{ shot.id }}', 'shot_description')"
+    >{{ shot.shot_description }}</div>
+    {% endif %}
+
+    <!-- Script -->
+    <div
+        class="script-text {% if video.font_preference == 'serif' %}font-serif{% else %}font-mono{% endif %} text-yt-text text-base my-4 py-3 border-y border-gray-800"
+        onclick="editCell(this, '{{ shot.id }}', 'script_line')"
+    >{{ shot.script_line or 'Tap to add script...' }}</div>
+
+    <!-- Footer: Vibes & Music -->
+    <div class="flex items-center justify-between">
+        <div class="flex flex-wrap gap-1 flex-1">
+            {% if shot.vibes %}
+                {% for vibe in shot.vibes %}
+                <span class="vibe-tag px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                    {{ vibe }}
+                </span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if shot.music_link %}
+        <a href="{{ shot.music_link }}" target="_blank" class="ml-3 text-blue-500 hover:text-blue-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+</div>

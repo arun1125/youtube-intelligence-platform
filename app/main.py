@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,8 +7,9 @@ import logging
 import os
 
 from app.config import get_settings
-from app.routes import thumbnail, auth, dashboard, user, payment
+from app.routes import thumbnail, auth, dashboard, user, payment, shotlist
 from app.utils.helpers import format_duration, format_view_count, format_time_ago
+from app.utils.session import get_session_data
 
 # Configure logging
 logging.basicConfig(
@@ -57,6 +59,35 @@ app.include_router(user.router)
 app.include_router(payment.router)
 app.include_router(dashboard.router)
 app.include_router(thumbnail.router)
+app.include_router(shotlist.router)
+
+# Home page route
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    """Landing page with feature cards."""
+    from app.middleware.auth import optional_auth
+
+    # Get user info if authenticated
+    user_data = None
+    try:
+        session_data = get_session_data(request)
+        if session_data:
+            from app.services.supabase_client import supabase_client
+            access_token = session_data.get("access_token")
+            if access_token:
+                user_response = supabase_client.auth.get_user(access_token)
+                user_data = {
+                    "email": user_response.user.email if user_response.user else None,
+                    "full_name": None,
+                    "avatar_url": None
+                }
+    except Exception:
+        pass  # Not authenticated or error, just show public page
+
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request, "user": user_data}
+    )
 
 # Health check endpoint
 @app.get("/health")

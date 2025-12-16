@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}YouTube Creator Tools - Professional Tools for YouTube Creators{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-bold mb-4">YouTube Creator Tools</h1>
+        <p class="text-xl text-yt-text-secondary max-w-2xl mx-auto">
+            Professional tools to help you create better content, test ideas, and plan your videos like a pro.
+        </p>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <!-- Thumbnail Tester Card -->
+        <a href="/thumbnail-tester" class="block group">
+            <div class="bg-yt-card border border-gray-800 rounded-2xl p-8 hover:border-yt-accent transition-all duration-300 h-full">
+                <div class="flex items-center gap-4 mb-6">
+                    <!-- Icon -->
+                    <div class="bg-yt-accent/10 p-4 rounded-xl group-hover:bg-yt-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-yt-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold group-hover:text-yt-accent transition-colors">Thumbnail Tester</h2>
+                </div>
+
+                <p class="text-yt-text-secondary text-lg mb-6">
+                    See how your thumbnail performs against real competitor videos. Test your title and thumbnail in a realistic YouTube homepage grid.
+                </p>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">AI-powered channel discovery for your target audience</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">Real competitor thumbnails and titles</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">Shuffle and compare multiple variations</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex items-center text-yt-accent group-hover:translate-x-2 transition-transform">
+                    <span class="font-semibold">Start Testing</span>
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- Shot List Card -->
+        <a href="/shotlist" class="block group">
+            <div class="bg-yt-card border border-gray-800 rounded-2xl p-8 hover:border-yt-accent transition-all duration-300 h-full">
+                <div class="flex items-center gap-4 mb-6">
+                    <!-- Icon -->
+                    <div class="bg-yt-accent/10 p-4 rounded-xl group-hover:bg-yt-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-yt-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold group-hover:text-yt-accent transition-colors">Shot List</h2>
+                </div>
+
+                <p class="text-yt-text-secondary text-lg mb-6">
+                    Plan your video productions with a professional shot list tool. Organize shots, scripts, and creative vibes all in one place.
+                </p>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">Organize projects and videos in one dashboard</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">Plan shots with technical details and creative vibes</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yt-accent mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-yt-text">Drag-and-drop shot reordering</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex items-center text-yt-accent group-hover:translate-x-2 transition-transform">
+                    <span class="font-semibold">Start Planning</span>
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    {% if not user %}
+    <!-- CTA Section -->
+    <div class="mt-16 text-center">
+        <p class="text-yt-text-secondary mb-4">Ready to level up your YouTube game?</p>
+        <a href="/auth/login" class="inline-block px-8 py-4 bg-yt-accent text-black font-bold rounded-lg hover:opacity-90 transition-all text-lg">
+            Sign In with Google
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

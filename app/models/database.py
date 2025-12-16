@@ -222,3 +222,136 @@ class UsageLogCreate(BaseModel):
     """Schema for creating a usage log entry."""
     action: str
     metadata: Optional[dict] = None
+
+
+# ============================================
+# 8. PRODUCTION PROJECTS - Video Production Planning
+# ============================================
+
+class ProductionProject(BaseModel):
+    """Project for organizing production videos (e.g., 'Tech Channel', 'Vlog Series')."""
+    id: UUID4
+    user_id: UUID4
+    name: str
+    description: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class ProductionProjectCreate(BaseModel):
+    """Schema for creating a new production project."""
+    name: str
+    description: Optional[str] = None
+
+
+class ProductionProjectUpdate(BaseModel):
+    """Schema for updating a production project."""
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+
+# ============================================
+# 9. PRODUCTION VIDEOS - Video Metadata & Planning
+# ============================================
+
+class FontPreference(str, Enum):
+    """Font preference for script display."""
+    MONO = "mono"
+    SERIF = "serif"
+
+
+class ProductionVideo(BaseModel):
+    """Video production metadata and planning details."""
+    id: UUID4
+    user_id: UUID4
+    title: str
+    project_id: Optional[UUID4] = None
+
+    # Planning fields
+    idea: Optional[str] = None
+    hook: Optional[str] = None
+    thumbnail_description: Optional[str] = None
+    notes: Optional[str] = None
+    global_vibe: Optional[str] = None
+
+    # Display preferences
+    font_preference: FontPreference = FontPreference.MONO
+    custom_column_defs: Optional[List[dict]] = Field(default_factory=list)
+
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+    class Config:
+        use_enum_values = True
+
+
+class ProductionVideoCreate(BaseModel):
+    """Schema for creating a new production video."""
+    title: str
+    project_id: Optional[UUID4] = None
+    idea: Optional[str] = None
+
+
+class ProductionVideoUpdate(BaseModel):
+    """Schema for updating a production video."""
+    title: Optional[str] = None
+    project_id: Optional[UUID4] = None
+    idea: Optional[str] = None
+    hook: Optional[str] = None
+    thumbnail_description: Optional[str] = None
+    notes: Optional[str] = None
+    global_vibe: Optional[str] = None
+    font_preference: Optional[FontPreference] = None
+
+
+# ============================================
+# 10. PRODUCTION SHOTS - Individual Shots in Videos
+# ============================================
+
+class ProductionShot(BaseModel):
+    """Individual shot within a video production with creative and technical specs."""
+    id: UUID4
+    video_id: UUID4
+    order_index: int = 0
+
+    # Shot details
+    shot_description: Optional[str] = None
+    shot_type: Optional[str] = None
+    script_line: Optional[str] = None
+
+    # Creative details
+    music_link: Optional[str] = None
+    vibes: Optional[List[str]] = Field(default_factory=list)
+    music_vibes: Optional[List[str]] = Field(default_factory=list)
+    music_inspiration: Optional[str] = None
+    roll_type: Optional[str] = None
+
+    # Flexible extra data
+    extra_data: Optional[dict] = Field(default_factory=dict)
+
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class ProductionShotCreate(BaseModel):
+    """Schema for creating a new production shot."""
+    video_id: UUID4
+    order_index: int = 0
+    shot_description: Optional[str] = None
+    shot_type: Optional[str] = None
+
+
+class ProductionShotUpdate(BaseModel):
+    """Schema for updating a production shot."""
+    order_index: Optional[int] = None
+    shot_description: Optional[str] = None
+    shot_type: Optional[str] = None
+    script_line: Optional[str] = None
+    music_link: Optional[str] = None
+    vibes: Optional[List[str]] = None
+    music_vibes: Optional[List[str]] = None
+    music_inspiration: Optional[str] = None
+    roll_type: Optional[str] = None
+    extra_data: Optional[dict] = None

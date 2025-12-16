@@ -35,9 +35,9 @@ templates = Jinja2Templates(directory="templates")
 sessions = {}
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/thumbnail-tester", response_class=HTMLResponse)
 async def index(request: Request, user_id: Optional[str] = Depends(optional_auth())):
-    """Render the main page with input form."""
+    """Render the thumbnail tester page with input form."""
     user = None
 
     if user_id:

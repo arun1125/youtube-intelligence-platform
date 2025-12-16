@@ -1,0 +1,256 @@
+<tr data-shot-id="{{ shot.id }}" class="hover:bg-yt-hover transition-colors">
+    <!-- Drag Handle -->
+    <td class="px-4 py-3">
+        <div class="drag-handle cursor-move text-gray-600 hover:text-gray-400">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+            </svg>
+        </div>
+    </td>
+
+    <!-- Roll Type -->
+    <td class="px-4 py-3">
+        <select
+            onchange="updateField('{{ shot.id }}', 'roll_type', this.value)"
+            class="bg-yt-bg border border-gray-800 text-yt-text text-sm rounded px-2 py-1 focus:outline-none focus:border-yt-accent w-full"
+        >
+            <option value="">-</option>
+            <option value="A-Roll" {% if shot.roll_type == 'A-Roll' %}selected{% endif %}>A-Roll</option>
+            <option value="B-Roll" {% if shot.roll_type == 'B-Roll' %}selected{% endif %}>B-Roll</option>
+        </select>
+    </td>
+
+    <!-- Shot Type -->
+    <td class="px-4 py-3">
+        <select
+            onchange="updateField('{{ shot.id }}', 'shot_type', this.value)"
+            class="bg-yt-bg border border-gray-800 text-yt-text text-sm rounded px-2 py-1 focus:outline-none focus:border-yt-accent w-full"
+        >
+            <option value="">-</option>
+            <option value="Wide" {% if shot.shot_type == 'Wide' %}selected{% endif %}>Wide</option>
+            <option value="Mid" {% if shot.shot_type == 'Mid' %}selected{% endif %}>Mid</option>
+            <option value="Close" {% if shot.shot_type == 'Close' %}selected{% endif %}>Close</option>
+            <option value="POV" {% if shot.shot_type == 'POV' %}selected{% endif %}>POV</option>
+            <option value="Top-Down" {% if shot.shot_type == 'Top-Down' %}selected{% endif %}>Top-Down</option>
+            <option value="Over-Shoulder" {% if shot.shot_type == 'Over-Shoulder' %}selected{% endif %}>Over-Shoulder</option>
+            <option value="Insert" {% if shot.shot_type == 'Insert' %}selected{% endif %}>Insert</option>
+        </select>
+    </td>
+
+    <!-- Description -->
+    <td class="px-4 py-3">
+        <div
+            class="editable-cell text-yt-text min-h-[24px] px-2 py-1 rounded"
+            onclick="editCell(this, '{{ shot.id }}', 'shot_description')"
+        >{{ shot.shot_description or '' }}</div>
+    </td>
+
+    <!-- Script -->
+    <td class="px-4 py-3 max-w-md">
+        <div
+            class="editable-cell script-text {% if video.font_preference == 'serif' %}font-serif{% else %}font-mono{% endif %} text-yt-text min-h-[24px] px-2 py-1 rounded whitespace-normal break-words"
+            onclick="editCell(this, '{{ shot.id }}', 'script_line')"
+        >{{ shot.script_line or '' }}</div>
+    </td>
+
+    <!-- Vibes -->
+    <td class="px-4 py-3">
+        <div id="vibes-{{ shot.id }}" class="flex flex-wrap gap-1">
+            {% if shot.vibes %}
+                {% for vibe in shot.vibes %}
+                <span class="vibe-tag px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
+                    {{ vibe }}
+                    <button onclick="removeVibe('{{ shot.id }}', '{{ vibe }}')" class="ml-1 text-blue-300 hover:text-blue-100">×</button>
+                </span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <input
+            type="text"
+            placeholder="+ vibe"
+            class="mt-1 w-full bg-transparent text-xs text-yt-text-secondary focus:outline-none"
+            onkeydown="handleVibeInput(event, '{{ shot.id }}')"
+        >
+    </td>
+
+    <!-- Music Vibes -->
+    <td class="px-4 py-3">
+        <div id="music-vibes-{{ shot.id }}" class="flex flex-wrap gap-1">
+            {% if shot.music_vibes %}
+                {% for vibe in shot.music_vibes %}
+                <span class="vibe-tag px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full border border-purple-500/30">
+                    {{ vibe }}
+                    <button onclick="removeMusicVibe('{{ shot.id }}', '{{ vibe }}')" class="ml-1 text-purple-300 hover:text-purple-100">×</button>
+                </span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <input
+            type="text"
+            placeholder="+ music vibe"
+            class="mt-1 w-full bg-transparent text-xs text-yt-text-secondary focus:outline-none"
+            onkeydown="handleMusicVibeInput(event, '{{ shot.id }}')"
+        >
+    </td>
+
+    <!-- Music Inspiration -->
+    <td class="px-4 py-3">
+        <input
+            type="text"
+            value="{{ shot.music_inspiration or '' }}"
+            placeholder="Song/artist link..."
+            class="w-full bg-transparent text-yt-text text-sm focus:outline-none focus:text-white px-2 py-1 rounded hover:bg-yt-hover"
+            onblur="updateField('{{ shot.id }}', 'music_inspiration', this.value)"
+            onkeydown="if(event.key==='Enter'){this.blur()}"
+        >
+    </td>
+
+    <!-- Delete -->
+    <td class="px-4 py-3 text-center">
+        <button
+            onclick="deleteShot('{{ shot.id }}', this.closest('tr'))"
+            class="text-gray-600 hover:text-red-500 transition-colors"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+        </button>
+    </td>
+</tr>
+
+<script>
+function updateField(shotId, field, value) {
+    const formData = new FormData();
+    formData.append('field', field);
+    formData.append('value', value);
+
+    fetch(`/api/shotlist/shots/${shotId}`, {
+        method: 'PUT',
+        body: formData
+    });
+}
+
+function handleVibeInput(event, shotId) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        const vibe = input.value.trim();
+
+        if (vibe) {
+            addVibe(shotId, vibe);
+            input.value = '';
+        }
+    }
+}
+
+function addVibe(shotId, vibe) {
+    const container = document.getElementById(`vibes-${shotId}`);
+
+    // Get current vibes
+    const currentVibes = Array.from(container.querySelectorAll('.vibe-tag')).map(el => el.textContent.replace('×', '').trim());
+    currentVibes.push(vibe);
+
+    // Update UI
+    const tag = document.createElement('span');
+    tag.className = 'vibe-tag px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30';
+    tag.innerHTML = `${vibe} <button onclick="removeVibe('${shotId}', '${vibe}')" class="ml-1 text-blue-300 hover:text-blue-100">×</button>`;
+    container.appendChild(tag);
+
+    // Save to backend
+    const formData = new FormData();
+    formData.append('field', 'vibes');
+    formData.append('value', JSON.stringify(currentVibes));
+
+    fetch(`/api/shotlist/shots/${shotId}`, {
+        method: 'PUT',
+        body: formData
+    });
+}
+
+function removeVibe(shotId, vibeToRemove) {
+    const container = document.getElementById(`vibes-${shotId}`);
+    const currentVibes = Array.from(container.querySelectorAll('.vibe-tag'))
+        .map(el => el.textContent.replace('×', '').trim())
+        .filter(v => v !== vibeToRemove);
+
+    // Update UI
+    const tags = container.querySelectorAll('.vibe-tag');
+    tags.forEach(tag => {
+        if (tag.textContent.replace('×', '').trim() === vibeToRemove) {
+            tag.remove();
+        }
+    });
+
+    // Save to backend
+    const formData = new FormData();
+    formData.append('field', 'vibes');
+    formData.append('value', JSON.stringify(currentVibes));
+
+    fetch(`/api/shotlist/shots/${shotId}`, {
+        method: 'PUT',
+        body: formData
+    });
+}
+
+function handleMusicVibeInput(event, shotId) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        const vibe = input.value.trim();
+
+        if (vibe) {
+            addMusicVibe(shotId, vibe);
+            input.value = '';
+        }
+    }
+}
+
+function addMusicVibe(shotId, vibe) {
+    const container = document.getElementById(`music-vibes-${shotId}`);
+
+    // Get current music vibes
+    const currentVibes = Array.from(container.querySelectorAll('.vibe-tag')).map(el => el.textContent.replace('×', '').trim());
+    currentVibes.push(vibe);
+
+    // Update UI
+    const tag = document.createElement('span');
+    tag.className = 'vibe-tag px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full border border-purple-500/30';
+    tag.innerHTML = `${vibe} <button onclick="removeMusicVibe('${shotId}', '${vibe}')" class="ml-1 text-purple-300 hover:text-purple-100">×</button>`;
+    container.appendChild(tag);
+
+    // Save to backend
+    const formData = new FormData();
+    formData.append('field', 'music_vibes');
+    formData.append('value', JSON.stringify(currentVibes));
+
+    fetch(`/api/shotlist/shots/${shotId}`, {
+        method: 'PUT',
+        body: formData
+    });
+}
+
+function removeMusicVibe(shotId, vibeToRemove) {
+    const container = document.getElementById(`music-vibes-${shotId}`);
+    const currentVibes = Array.from(container.querySelectorAll('.vibe-tag'))
+        .map(el => el.textContent.replace('×', '').trim())
+        .filter(v => v !== vibeToRemove);
+
+    // Update UI
+    const tags = container.querySelectorAll('.vibe-tag');
+    tags.forEach(tag => {
+        if (tag.textContent.replace('×', '').trim() === vibeToRemove) {
+            tag.remove();
+        }
+    });
+
+    // Save to backend
+    const formData = new FormData();
+    formData.append('field', 'music_vibes');
+    formData.append('value', JSON.stringify(currentVibes));
+
+    fetch(`/api/shotlist/shots/${shotId}`, {
+        method: 'PUT',
+        body: formData
+    });
+}
+</script>
