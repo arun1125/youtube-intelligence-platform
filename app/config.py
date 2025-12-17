@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""  # Optional for local dev
 
     # AI Configuration
-    gemini_model: str = "gemini-1.5-flash"  # Better free tier: 15 RPM, 1500 RPD
+    gemini_model: str = "gemini-2.5-flash"  # Current stable Flash model with good free tier
     claude_model: str = "claude-3-5-haiku-20241022"  # Fast and cheap fallback
 
     # File Storage

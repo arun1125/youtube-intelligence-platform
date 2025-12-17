@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 from typing import List
 import logging
 import json
@@ -15,10 +15,10 @@ class AIService:
 
     def __init__(self):
         """Initialize AI services with API keys."""
-        # Initialize Gemini
+        # Initialize Gemini with new SDK
         api_key = settings.gemini_api_key or settings.google_api_key
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(settings.gemini_model)
+        self.gemini_client = genai.Client(api_key=api_key)
+        self.model_name = settings.gemini_model
 
         # Initialize Claude (optional fallback)
         self.claude_client = None
@@ -63,7 +63,10 @@ Return ONLY the JSON array, no other text.
 
         # Try Gemini first
         try:
-            response = self.model.generate_content(prompt)
+            response = self.gemini_client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             text = response.text.strip()
 
             channels = self._parse_channel_response(text, num_channels)
