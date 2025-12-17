@@ -5,9 +5,12 @@ jinja2==3.1.4
 python-multipart==0.0.17
 aiofiles==24.1.0
 
-# Existing Dependencies
+# AI Services
 google-api-python-client==2.154.0
 google-generativeai==0.8.3
+anthropic==0.39.0
+
+# Other Dependencies
 apify-client==1.9.1
 pandas==2.2.3
 requests==2.32.3

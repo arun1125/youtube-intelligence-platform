@@ -11,13 +11,24 @@ settings = get_settings()
 
 
 class AIService:
-    """Service for AI-powered channel suggestions using Google Gemini."""
+    """Service for AI-powered channel suggestions using Google Gemini with Claude fallback."""
 
     def __init__(self):
-        """Initialize Gemini AI with API key."""
+        """Initialize AI services with API keys."""
+        # Initialize Gemini
         api_key = settings.gemini_api_key or settings.google_api_key
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(settings.gemini_model)
+
+        # Initialize Claude (optional fallback)
+        self.claude_client = None
+        if settings.anthropic_api_key:
+            try:
+                from anthropic import Anthropic
+                self.claude_client = Anthropic(api_key=settings.anthropic_api_key)
+                logger.info("✓ Claude API initialized as fallback")
+            except ImportError:
+                logger.warning("anthropic package not installed - Claude fallback unavailable")
 
     def get_channel_suggestions(self, persona: str, num_channels: int = 10) -> List[str]:
         """
@@ -50,23 +61,58 @@ Example output format:
 Return ONLY the JSON array, no other text.
 """
 
+        # Try Gemini first
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
 
-            # Try to parse as JSON first
             channels = self._parse_channel_response(text, num_channels)
 
             if channels:
-                logger.info(f"✓ Successfully generated {len(channels)} channel suggestions")
+                logger.info(f"✓ Gemini: Generated {len(channels)} channel suggestions")
                 return channels
             else:
-                logger.warning("Failed to parse channel suggestions, using fallback")
-                return self._fallback_channels(num_channels)
-
+                logger.warning("Gemini: Failed to parse response, trying Claude fallback")
         except Exception as e:
-            logger.error(f"Error calling Gemini API: {e}")
-            return self._fallback_channels(num_channels)
+            logger.error(f"Gemini API error: {e}")
+            logger.info("Trying Claude fallback...")
+
+        # Try Claude as fallback
+        if self.claude_client:
+            try:
+                channels = self._get_claude_suggestions(num_channels, prompt)
+                if channels:
+                    logger.info(f"✓ Claude: Generated {len(channels)} channel suggestions")
+                    return channels
+            except Exception as e:
+                logger.error(f"Claude API error: {e}")
+
+        # Last resort: hardcoded fallback
+        logger.warning("All AI services failed, using hardcoded fallback")
+        return self._fallback_channels(num_channels)
+
+    def _get_claude_suggestions(self, num_channels: int, prompt: str) -> List[str]:
+        """
+        Get channel suggestions using Claude API.
+
+        Args:
+            num_channels: Number of channels to suggest
+            prompt: The prompt to send to Claude
+
+        Returns:
+            List of channel handles
+        """
+        message = self.claude_client.messages.create(
+            model=settings.claude_model,
+            max_tokens=1024,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
+        )
+
+        text = message.content[0].text.strip()
+        return self._parse_channel_response(text, num_channels)
 
     def _parse_channel_response(self, text: str, expected_count: int) -> List[str]:
         """

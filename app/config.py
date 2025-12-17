@@ -25,14 +25,18 @@ class Settings(BaseSettings):
     google_client_secret: str
     google_redirect_uri: str
 
+    # Anthropic Claude API
+    anthropic_api_key: str = ""  # Optional fallback for AI suggestions
+
     # Stripe
     stripe_secret_key: str
     stripe_publishable_key: str
     stripe_price_id_pro: str
     stripe_webhook_secret: str = ""  # Optional for local dev
 
-    # Gemini Configuration
-    gemini_model: str = "gemini-2.0-flash-exp"  # Higher free tier quota than preview models
+    # AI Configuration
+    gemini_model: str = "gemini-1.5-flash"  # Better free tier: 15 RPM, 1500 RPD
+    claude_model: str = "claude-3-5-haiku-20241022"  # Fast and cheap fallback
 
     # File Storage
     upload_dir: str = "static/uploads"
