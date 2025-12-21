@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}{{ channel_name }} - Viral Videos - YouTube Creator Tools{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header with Back Button -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="/viral-researcher" class="text-yt-text-secondary hover:text-yt-accent transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold">{{ channel_name }}</h1>
+                <p class="text-yt-text-secondary mt-1">
+                    {{ total_videos }} videos found in the last 365 days (5+ minutes)
+                </p>
+            </div>
+        </div>
+
+        <!-- Refresh Button -->
+        <button hx-post="/viral-researcher/scrape"
+            hx-vals='{"channel_input": "{{ channel_id }}", "force_refresh": true}' hx-target="#refresh-status"
+            hx-indicator="#refresh-spinner"
+            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Refresh Data</span>
+            <div id="refresh-spinner" class="htmx-indicator">
+                <div class="spinner w-4 h-4"></div>
+            </div>
+        </button>
+    </div>
+
+    <div id="refresh-status"></div>
+
+    <!-- View Bucket Stats -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <h2 class="text-xl font-bold mb-4">View Distribution</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {% for bucket, count in bucket_stats.items() %}
+            <div class="bg-yt-bg rounded-lg p-4 border border-gray-700">
+                <p class="text-xs text-yt-text-secondary">{{ bucket }}</p>
+                <p class="text-2xl font-bold mt-1">{{ count }}</p>
+                <p class="text-xs text-yt-text-secondary mt-1">videos</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Filter by Bucket -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Filter by Views</h2>
+            <div class="flex items-center space-x-2">
+                <label class="text-sm text-yt-text-secondary">Sort:</label>
+                <select id="sort-order" onchange="updateSort()"
+                    class="px-3 py-2 bg-yt-bg border border-gray-700 rounded-lg text-sm focus:outline-none focus:border-yt-accent">
+                    <option value="views_desc" selected>Views (High to Low)</option>
+                    <option value="views_asc">Views (Low to High)</option>
+                    <option value="date_desc">Newest First</option>
+                    <option value="date_asc">Oldest First</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Bucket Tabs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="filterBucket('all')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-accent text-white"
+                data-bucket="all">
+                All Videos
+            </button>
+            <button onclick="filterBucket('1M+')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent"
+                data-bucket="1M+">
+                1M+ Views
+            </button>
+            <button onclick="filterBucket('100k-1M')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent"
+                data-bucket="100k-1M">
+                100k-1M
+            </button>
+            <button onclick="filterBucket('50-100k')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent"
+                data-bucket="50-100k">
+                50k-100k
+            </button>
+            <button onclick="filterBucket('10-50k')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent"
+                data-bucket="10-50k">
+                10k-50k
+            </button>
+            <button onclick="filterBucket('5-10k')"
+                class="bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent"
+                data-bucket="5-10k">
+                5k-10k
+            </button>
+        </div>
+
+        <!-- Videos Grid -->
+        <div id="videos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for video in videos %}
+            <a href="/viral-researcher/video/{{ video.video_id }}"
+                class="video-card block bg-yt-bg border border-gray-700 rounded-lg overflow-hidden hover:border-yt-accent transition-colors group"
+                data-bucket="{{ video.view_bucket }}" data-views="{{ video.view_count }}"
+                data-date="{{ video.published_at }}">
+                <!-- Thumbnail -->
+                <div class="relative aspect-video bg-gray-900">
+                    <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}"
+                        class="w-full h-full object-cover group-hover:opacity-90 transition-opacity" loading="lazy">
+                    <!-- Duration Badge -->
+                    <div
+                        class="absolute bottom-2 right-2 bg-black bg-opacity-80 px-2 py-1 rounded text-xs font-semibold">
+                        {{ video.duration_formatted }}
+                    </div>
+                    <!-- View Bucket Badge -->
+                    <div class="absolute top-2 left-2 bg-yt-accent px-2 py-1 rounded text-xs font-semibold">
+                        {{ video.view_bucket }}
+                    </div>
+                </div>
+
+                <!-- Video Info -->
+                <div class="p-4">
+                    <h3 class="font-semibold line-clamp-2 mb-2">{{ video.title }}</h3>
+                    <div class="flex items-center justify-between text-sm text-yt-text-secondary">
+                        <span>{{ video.view_count_formatted }} views</span>
+                        <span>{{ video.published_ago }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        {% if not videos %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 text-yt-text-secondary mx-auto mb-4 opacity-50" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <p class="text-yt-text-secondary">No videos found in this channel</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentBucket = 'all';
+    let currentSort = 'views_desc';
+
+    function filterBucket(bucket) {
+        currentBucket = bucket;
+        applyFilters();
+
+        // Update tab styles
+        document.querySelectorAll('.bucket-tab').forEach(tab => {
+            if (tab.dataset.bucket === bucket) {
+                tab.className = 'bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-accent text-white';
+            } else {
+                tab.className = 'bucket-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-yt-bg border border-gray-700 hover:border-yt-accent';
+            }
+        });
+    }
+
+    function updateSort() {
+        currentSort = document.getElementById('sort-order').value;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const grid = document.getElementById('videos-grid');
+        const cards = Array.from(grid.querySelectorAll('.video-card'));
+
+        // Filter
+        cards.forEach(card => {
+            const cardBucket = card.dataset.bucket;
+            if (currentBucket === 'all' || cardBucket === currentBucket) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Sort visible cards
+        const visibleCards = cards.filter(card => card.style.display !== 'none');
+        visibleCards.sort((a, b) => {
+            switch (currentSort) {
+                case 'views_desc':
+                    return parseInt(b.dataset.views) - parseInt(a.dataset.views);
+                case 'views_asc':
+                    return parseInt(a.dataset.views) - parseInt(b.dataset.views);
+                case 'date_desc':
+                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                case 'date_asc':
+                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                default:
+                    return 0;
+            }
+        });
+
+        // Re-append in sorted order
+        visibleCards.forEach(card => grid.appendChild(card));
+    }
+</script>
+{% endblock %}

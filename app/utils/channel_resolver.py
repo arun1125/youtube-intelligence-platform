@@ -19,13 +19,29 @@ def get_channel_id_from_html(channel_input: str) -> Tuple[Optional[str], str]:
     Returns:
         Tuple of (channel_id, url) where channel_id is None if not found
     """
-    clean_input = channel_input.replace(" ", "")
-    if not clean_input.startswith("@"):
-        clean_input = f"@{clean_input}"
+    clean_input = channel_input.strip()
 
-    url = f"https://www.youtube.com/{clean_input}"
-    logger.info(f"Resolving ID for: {clean_input}")
+    # Case 1: Full URL
+    if "youtube.com" in clean_input or "youtu.be" in clean_input:
+        if "@" in clean_input and "channel/" not in clean_input and "c/" not in clean_input:
+            # Extract handle from URL (e.g. https://youtube.com/@user)
+            clean_input = clean_input.split("youtube.com/")[-1].split("?")[0]
+            # Ensure it starts with @ (usually it does if split correctly)
+            if not clean_input.startswith("@"):
+                 clean_input = f"@{clean_input}"
+        else:
+             # It's a channel ID link or custom name, use as is
+             url = clean_input
+             logger.info(f"Resolving ID for URL: {url}")
+             clean_input = None # Marker
 
+    # Case 2: Handle or Name
+    if clean_input:
+        if not clean_input.startswith("@"):
+            clean_input = f"@{clean_input}"
+        url = f"https://www.youtube.com/{clean_input}"
+        logger.info(f"Resolving ID for handle: {clean_input}")
+    
     headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         response = requests.get(url, headers=headers, timeout=10)

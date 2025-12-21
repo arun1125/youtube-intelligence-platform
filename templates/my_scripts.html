@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}My Scripts - Viral Researcher{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold">My Generated Scripts</h1>
+        <a href="/viral-researcher"
+            class="px-4 py-2 bg-yt-accent hover:bg-blue-600 rounded-lg text-sm transition-colors">
+            + New Research
+        </a>
+    </div>
+
+    {% if scripts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for script in scripts %}
+        <a href="/viral-researcher/script/{{ script.id }}" class="block group">
+            <div
+                class="bg-yt-card border border-gray-800 rounded-lg p-6 hover:border-yt-accent transition-colors h-full flex flex-col">
+                <div class="flex items-start justify-between mb-4">
+                    <span class="text-xs font-mono text-yt-text-secondary">{{ script.created_at|default('Just now')
+                        }}</span>
+                    <span
+                        class="px-2 py-1 bg-yt-bg rounded text-xs text-yt-text-secondary group-hover:bg-yt-accent group-hover:text-white transition-colors">
+                        View Script
+                    </span>
+                </div>
+
+                <h3 class="font-semibold text-lg mb-2 line-clamp-2">
+                    {{ script.selected_angle or 'Untitled Script' }}
+                </h3>
+
+                <div class="mt-auto pt-4 flex items-center text-sm text-yt-text-secondary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Source Video ID: {{ script.original_video_id }}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 bg-yt-card border border-gray-800 rounded-lg">
+        <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="text-xl font-semibold mb-2">No scripts yet</h3>
+        <p class="text-yt-text-secondary mb-6">Start by researching a viral video to generate your first script.</p>
+        <a href="/viral-researcher"
+            class="px-6 py-3 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors">
+            Start Research
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

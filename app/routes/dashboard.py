@@ -76,12 +76,20 @@ async def dashboard(request: Request, user_id: str = Depends(require_auth())):
             "avatar_url": profile.get("avatar_url")
         }
 
+        # Get creator profile
+        from app.services.creator_profile_service import CreatorProfileService
+        profile_service = CreatorProfileService()
+        creator_profile = profile_service.get_user_profile(user_id)
+        
+        logger.info(f"Dashboard: User {user_id} - Profile found: {creator_profile is not None}")
+
         return templates.TemplateResponse(
             "dashboard.html",
             {
                 "request": request,
                 "user": user,
                 "profile": profile,
+                "creator_profile": creator_profile,
                 "has_api_key": has_api_key,
                 "recent_tests": recent_tests
             }

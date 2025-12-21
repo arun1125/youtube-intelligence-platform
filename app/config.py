@@ -28,6 +28,15 @@ class Settings(BaseSettings):
     # Anthropic Claude API
     anthropic_api_key: str = ""  # Optional fallback for AI suggestions
 
+    # Apify (for transcript extraction)
+    apify_api_key: str = ""
+    apify_transcript_actor: str = "Uwpce1RSXlrzF6WBA"  # YouTube Transcript Scraper
+
+    # Research APIs (for Viral Researcher)
+    exa_api_key: str = ""
+    perplexity_api_key: str = ""
+    firecrawl_api_key: str = ""
+
     # Stripe
     stripe_secret_key: str
     stripe_publishable_key: str
@@ -35,8 +44,8 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""  # Optional for local dev
 
     # AI Configuration
-    gemini_model: str = "gemini-2.0-flash"  # Gemini 2.0 Flash - may have better availability
-    claude_model: str = "claude-3-5-haiku-20241022"  # Fast and cheap fallback
+    gemini_model: str = "gemini-2.0-flash"  # Gemini 2.0 Flash - for research synthesis
+    claude_model: str = "claude-3-5-sonnet-20241022"  # Sonnet for creative script writing
 
     # File Storage
     upload_dir: str = "static/uploads"
@@ -51,6 +60,11 @@ class Settings(BaseSettings):
 
     # Shorts Filter
     shorts_duration_threshold: int = 60  # seconds
+
+    # Viral Researcher Settings
+    video_min_duration: int = 300  # 5 minutes (filter out shorts)
+    max_videos_per_channel: int = 100  # Last 365 days cap
+    transcript_timeout: int = 60  # seconds
 
     # Server Configuration
     host: str = "127.0.0.1"

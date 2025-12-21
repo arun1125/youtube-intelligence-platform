@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}{{ video.title }} - Viral Researcher{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header with Back Button -->
+    <div class="flex items-center space-x-4">
+        <a href="/viral-researcher/videos/{{ video.channel_id }}" class="text-yt-text-secondary hover:text-yt-accent transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <div class="flex-1">
+            <h1 class="text-2xl font-bold line-clamp-2">{{ video.title }}</h1>
+            <p class="text-sm text-yt-text-secondary mt-1">{{ video.channel_name }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content (Left Column) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Video Player -->
+            <div class="bg-yt-card rounded-lg overflow-hidden border border-gray-800">
+                <div class="aspect-video bg-black">
+                    <iframe
+                        src="https://www.youtube.com/embed/{{ video.video_id }}"
+                        class="w-full h-full"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-center justify-between text-sm text-yt-text-secondary">
+                        <span>{{ video.view_count_formatted }} views</span>
+                        <span>{{ video.published_ago }}</span>
+                        <a
+                            href="{{ video.video_url }}"
+                            target="_blank"
+                            class="text-yt-accent hover:underline flex items-center space-x-1"
+                        >
+                            <span>Watch on YouTube</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transcript Section -->
+            <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+                <h2 class="text-xl font-bold mb-4">Video Transcript</h2>
+
+                {% if video.transcript %}
+                <!-- Transcript Available -->
+                <div id="transcript-content" class="space-y-4">
+                    <div class="bg-yt-bg rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <p class="text-sm text-yt-text whitespace-pre-wrap">{{ video.transcript }}</p>
+                    </div>
+                    <button
+                        onclick="copyTranscript()"
+                        class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors flex items-center space-x-2"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Copy Transcript</span>
+                    </button>
+                </div>
+                {% else %}
+                <!-- Fetch Transcript -->
+                <div id="transcript-fetcher">
+                    <p class="text-yt-text-secondary mb-4">
+                        Transcript not yet fetched. Click below to extract the transcript from this video.
+                    </p>
+                    <button
+                        hx-post="/viral-researcher/video/{{ video.video_id }}/fetch-transcript"
+                        hx-target="#transcript-fetcher"
+                        hx-indicator="#transcript-spinner"
+                        class="px-6 py-3 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Fetch Transcript</span>
+                        <div id="transcript-spinner" class="htmx-indicator">
+                            <div class="spinner w-5 h-5"></div>
+                        </div>
+                    </button>
+                    <p class="text-xs text-yt-text-secondary mt-2">
+                        This may take 30-60 seconds...
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Generate Angles Section -->
+            {% if video.transcript %}
+            <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+                <h2 class="text-xl font-bold mb-4">Generate Creative Angles</h2>
+
+                <div id="angles-section">
+                    {% if angles %}
+                    <!-- Angles Already Generated -->
+                    <div class="space-y-4">
+                        <p class="text-sm text-yt-text-secondary mb-4">
+                            Select an angle to continue with research and script generation:
+                        </p>
+                        {% for angle in angles %}
+                        <div class="bg-yt-bg border border-gray-700 rounded-lg p-4 hover:border-yt-accent transition-colors cursor-pointer"
+                             onclick="selectAngle({{ loop.index0 }})">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-lg">{{ angle.angle_name }}</h3>
+                                    <p class="text-sm text-yt-text-secondary mt-2">{{ angle.core_hook }}</p>
+                                    <p class="text-xs text-yt-text-secondary mt-2">
+                                        <span class="font-medium">Differentiator:</span> {{ angle.key_differentiator }}
+                                    </p>
+                                    <div class="flex items-center space-x-4 mt-3 text-xs">
+                                        <span class="px-2 py-1 bg-purple-900 bg-opacity-30 rounded text-purple-400">
+                                            {{ angle.target_emotion }}
+                                        </span>
+                                        <span class="px-2 py-1 bg-green-900 bg-opacity-30 rounded text-green-400">
+                                            {{ angle.estimated_appeal }} appeal
+                                        </span>
+                                    </div>
+                                </div>
+                                <svg class="w-5 h-5 text-yt-text-secondary flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Generate Angles -->
+                    <p class="text-yt-text-secondary mb-4">
+                        Generate 3-5 creative angles based on this viral video and your creator profile.
+                    </p>
+                    <button
+                        hx-post="/viral-researcher/video/{{ video.video_id }}/generate-angles"
+                        hx-target="#angles-section"
+                        hx-indicator="#angles-spinner"
+                        class="px-6 py-3 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        <span>Generate Angles</span>
+                        <div id="angles-spinner" class="htmx-indicator">
+                            <div class="spinner w-5 h-5"></div>
+                        </div>
+                    </button>
+                    <p class="text-xs text-yt-text-secondary mt-2">
+                        Uses Claude AI to create unique angles for your niche
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar (Right Column) -->
+        <div class="space-y-6">
+            <!-- Video Stats -->
+            <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+                <h3 class="font-semibold mb-4">Video Stats</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">View Bucket</span>
+                        <span class="px-3 py-1 bg-yt-accent bg-opacity-20 rounded text-yt-accent font-semibold">
+                            {{ video.view_bucket }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Views</span>
+                        <span class="font-semibold">{{ video.view_count_formatted }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Duration</span>
+                        <span class="font-semibold">{{ video.duration_formatted }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Published</span>
+                        <span class="font-semibold">{{ video.published_at_formatted }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Scraped</span>
+                        <span class="font-semibold">{{ video.scraped_ago }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Progress -->
+            <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+                <h3 class="font-semibold mb-4">Workflow Progress</h3>
+                <div class="space-y-3">
+                    <!-- Step 1 -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold">Video Selected</p>
+                            <p class="text-xs text-yt-text-secondary">{{ video.view_bucket }} views</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex items-start space-x-3">
+                        {% if video.transcript %}
+                        <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <div class="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            2
+                        </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold">Transcript Fetched</p>
+                            <p class="text-xs text-yt-text-secondary">
+                                {% if video.transcript %}Complete{% else %}Pending{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex items-start space-x-3">
+                        {% if angles %}
+                        <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <div class="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            3
+                        </div>
+                        {% endif %}
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold">Angles Generated</p>
+                            <p class="text-xs text-yt-text-secondary">
+                                {% if angles %}{{ angles|length }} angles{% else %}Pending{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            4
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold">Research & Script</p>
+                            <p class="text-xs text-yt-text-secondary">Not started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function copyTranscript() {
+        const transcript = document.querySelector('#transcript-content p').textContent;
+        navigator.clipboard.writeText(transcript).then(() => {
+            // Show toast notification
+            alert('Transcript copied to clipboard!');
+        });
+    }
+
+    function selectAngle(index) {
+        // Store selected angle and redirect to angle selection page
+        window.location.href = `/viral-researcher/angle-selection?video_id={{ video.video_id }}&angle_index=${index}`;
+    }
+</script>
+{% endblock %}

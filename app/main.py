@@ -7,7 +7,7 @@ import logging
 import os
 
 from app.config import get_settings
-from app.routes import thumbnail, auth, dashboard, user, payment, shotlist
+from app.routes import thumbnail, auth, dashboard, user, payment, shotlist, viral_researcher, creator_profile
 from app.utils.helpers import format_duration, format_view_count, format_time_ago
 from app.utils.session import get_session_data
 
@@ -38,6 +38,9 @@ templates.env.filters["format_duration"] = format_duration
 templates.env.filters["format_view_count"] = format_view_count
 templates.env.filters["format_time_ago"] = format_time_ago
 
+# Attach templates to app state for access in routers
+app.state.templates = templates
+
 # Add CORS middleware
 # In production, this will be restricted to your domain
 allowed_origins = ["*"] if settings.debug else [
@@ -60,6 +63,8 @@ app.include_router(payment.router)
 app.include_router(dashboard.router)
 app.include_router(thumbnail.router)
 app.include_router(shotlist.router)
+app.include_router(viral_researcher.router)
+app.include_router(creator_profile.router)
 
 # Home page route
 @app.get("/", response_class=HTMLResponse)

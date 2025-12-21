@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Select Angle - Viral Researcher{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- Header with Back Button -->
+    <div class="flex items-center space-x-4">
+        <a href="/viral-researcher/video/{{ video.video_id }}" class="text-yt-text-secondary hover:text-yt-accent transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <div>
+            <h1 class="text-3xl font-bold">Review Selected Angle</h1>
+            <p class="text-yt-text-secondary mt-1">
+                Confirm your angle choice before starting research & script generation
+            </p>
+        </div>
+    </div>
+
+    <!-- Source Video Info -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <h2 class="text-sm font-semibold text-yt-text-secondary mb-3">SOURCE VIDEO</h2>
+        <div class="flex items-start space-x-4">
+            <img
+                src="{{ video.thumbnail_url }}"
+                alt="{{ video.title }}"
+                class="w-32 h-18 object-cover rounded flex-shrink-0"
+            >
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold line-clamp-2">{{ video.title }}</h3>
+                <p class="text-sm text-yt-text-secondary mt-1">{{ video.channel_name }}</p>
+                <div class="flex items-center space-x-4 mt-2 text-xs text-yt-text-secondary">
+                    <span>{{ video.view_count_formatted }} views</span>
+                    <span>•</span>
+                    <span class="px-2 py-1 bg-yt-accent bg-opacity-20 rounded text-yt-accent font-semibold">
+                        {{ video.view_bucket }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Angle -->
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Selected Angle</h2>
+            <span class="px-3 py-1 bg-green-900 bg-opacity-30 rounded text-green-400 text-sm font-semibold">
+                {{ selected_angle.estimated_appeal }} appeal
+            </span>
+        </div>
+
+        <div class="bg-yt-bg rounded-lg p-6 space-y-4">
+            <div>
+                <p class="text-xs text-yt-text-secondary mb-1">ANGLE NAME</p>
+                <h3 class="text-2xl font-bold">{{ selected_angle.angle_name }}</h3>
+            </div>
+
+            <div>
+                <p class="text-xs text-yt-text-secondary mb-1">CORE HOOK</p>
+                <p class="text-lg">{{ selected_angle.core_hook }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs text-yt-text-secondary mb-1">KEY DIFFERENTIATOR</p>
+                <p class="text-yt-text">{{ selected_angle.key_differentiator }}</p>
+            </div>
+
+            <div class="flex items-center space-x-4 pt-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-yt-text-secondary">Target Emotion:</span>
+                    <span class="px-3 py-1 bg-purple-900 bg-opacity-30 rounded text-purple-400 text-sm font-semibold">
+                        {{ selected_angle.target_emotion }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Angles (Optional) -->
+    {% if other_angles %}
+    <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <h3 class="font-semibold mb-4 text-yt-text-secondary">Other Generated Angles</h3>
+        <div class="space-y-3">
+            {% for angle in other_angles %}
+            <div class="bg-yt-bg border border-gray-700 rounded-lg p-4 hover:border-yt-accent transition-colors cursor-pointer"
+                 onclick="changeAngle({{ loop.index }})">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h4 class="font-semibold">{{ angle.angle_name }}</h4>
+                        <p class="text-sm text-yt-text-secondary mt-1">{{ angle.core_hook }}</p>
+                    </div>
+                    <svg class="w-5 h-5 text-yt-text-secondary flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- What Happens Next -->
+    <div class="bg-gradient-to-r from-blue-900 to-purple-900 bg-opacity-20 rounded-lg p-6 border border-blue-700">
+        <h3 class="text-lg font-bold mb-4">What Happens Next</h3>
+        <div class="space-y-3">
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    1
+                </div>
+                <div>
+                    <p class="font-semibold">Research Phase</p>
+                    <p class="text-sm text-yt-text-secondary">
+                        AI searches for trending topics (Exa), fact-checks claims (Perplexity), and scrapes supporting content (Firecrawl)
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    2
+                </div>
+                <div>
+                    <p class="font-semibold">Synthesis Phase</p>
+                    <p class="text-sm text-yt-text-secondary">
+                        Gemini AI processes all research into a structured brief with facts, statistics, and narrative hooks
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    3
+                </div>
+                <div>
+                    <p class="font-semibold">Script Generation</p>
+                    <p class="text-sm text-yt-text-secondary">
+                        Claude AI writes your complete script using the research brief, your creator profile, and proven viral patterns
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-yellow-900 bg-opacity-20 border border-yellow-700 rounded-lg">
+            <div class="flex items-start space-x-2">
+                <svg class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <div class="text-sm">
+                    <p class="font-semibold text-yellow-500">Estimated Time: 2-3 minutes</p>
+                    <p class="text-yt-text-secondary mt-1">
+                        Please keep this tab open while we process your request. You can watch the progress in real-time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-between">
+        <a
+            href="/viral-researcher/video/{{ video.video_id }}"
+            class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+        >
+            ← Change Angle
+        </a>
+
+        <button
+            id="generate-btn"
+            hx-post="/viral-researcher/generate-script"
+            hx-vals='{"video_id": "{{ video.video_id }}", "angle_index": {{ angle_index }}}'
+            hx-target="#generation-progress"
+            hx-indicator="#generate-spinner"
+            class="px-8 py-3 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors flex items-center space-x-2"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <span>Generate Script</span>
+            <div id="generate-spinner" class="htmx-indicator">
+                <div class="spinner w-5 h-5"></div>
+            </div>
+        </button>
+    </div>
+
+    <!-- Progress Container -->
+    <div id="generation-progress" class="space-y-4"></div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function changeAngle(newIndex) {
+        window.location.href = `/viral-researcher/angle-selection?video_id={{ video.video_id }}&angle_index=${newIndex}`;
+    }
+
+    // Listen for script generation completion
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'generation-progress') {
+            const response = event.detail.xhr.response;
+            // Check if response contains script_id (successful generation)
+            try {
+                const data = JSON.parse(response);
+                if (data.script_id) {
+                    // Redirect to script output page
+                    window.location.href = `/viral-researcher/script/${data.script_id}`;
+                }
+            } catch (e) {
+                // Response might be HTML progress updates, which is fine
+            }
+        }
+    });
+
+    // Disable button during generation
+    document.body.addEventListener('htmx:beforeRequest', function(event) {
+        if (event.detail.elt.id === 'generate-btn') {
+            event.detail.elt.disabled = true;
+            event.detail.elt.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    });
+</script>
+{% endblock %}

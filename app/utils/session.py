@@ -158,3 +158,22 @@ def is_authenticated(request: Request) -> bool:
         True if authenticated
     """
     return get_session_data(request) is not None
+
+
+async def get_current_user(request: Request) -> Optional[Dict[str, Any]]:
+    """
+    Get current authenticated user.
+
+    Args:
+        request: FastAPI request object
+
+    Returns:
+        User info dict or None
+    """
+    access_token = get_access_token(request)
+    
+    if not access_token:
+        return None
+
+    from app.services.auth_service import auth_service
+    return auth_service.get_user_from_token(access_token)

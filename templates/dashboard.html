@@ -104,6 +104,294 @@
         </div>
     </div>
 
+    <!-- Creator Profile Section -->
+    <div id="creator-profile" class="bg-yt-card rounded-lg p-6 border border-gray-800">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Creator Profile</h2>
+            {% if creator_profile %}
+            <button
+                onclick="document.getElementById('profile-form').classList.toggle('hidden')"
+                class="text-sm text-yt-accent hover:underline"
+            >
+                Edit Profile
+            </button>
+            {% endif %}
+        </div>
+
+        {% if creator_profile %}
+        <!-- Existing Profile Display -->
+        <div id="profile-display">
+            <div class="bg-yt-bg rounded-lg p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-yt-text-secondary mb-1">CREATOR NAME</p>
+                        <p class="font-semibold">{{ creator_profile.creator_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-yt-text-secondary mb-1">NICHE</p>
+                        <p class="font-semibold">{{ creator_profile.niche }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-yt-text-secondary mb-1">TONE PREFERENCE</p>
+                        <p class="font-semibold">{{ creator_profile.tone_preference }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-yt-text-secondary mb-1">TARGET AUDIENCE</p>
+                        <p class="font-semibold">{{ creator_profile.target_audience }}</p>
+                    </div>
+                </div>
+
+                {% if creator_profile.expertise_areas %}
+                <div>
+                    <p class="text-xs text-yt-text-secondary mb-2">EXPERTISE AREAS</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for area in creator_profile.expertise_areas %}
+                        <span class="px-3 py-1 bg-yt-accent bg-opacity-20 rounded text-yt-accent text-sm font-semibold">
+                            {{ area }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if creator_profile.bio %}
+                <div>
+                    <p class="text-xs text-yt-text-secondary mb-1">BIO</p>
+                    <p class="text-sm text-yt-text-secondary">{{ creator_profile.bio }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-4">
+                <a href="/viral-researcher" class="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors">
+                    → Open Viral Researcher
+                </a>
+            </div>
+        </div>
+
+        <!-- Edit Profile Form (Hidden by default) -->
+        <form
+            id="profile-form"
+            class="hidden space-y-4"
+            hx-post="/api/creator-profile"
+            hx-swap="none"
+            hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="creator_name" class="block text-sm font-medium mb-2">Creator Name *</label>
+                    <input
+                        type="text"
+                        id="creator_name"
+                        name="creator_name"
+                        value="{{ creator_profile.creator_name }}"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        required
+                    >
+                </div>
+                <div>
+                    <label for="niche" class="block text-sm font-medium mb-2">Niche *</label>
+                    <input
+                        type="text"
+                        id="niche"
+                        name="niche"
+                        value="{{ creator_profile.niche }}"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Technology, Finance, Fitness"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label for="bio" class="block text-sm font-medium mb-2">Bio</label>
+                <textarea
+                    id="bio"
+                    name="bio"
+                    rows="3"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="Tell us about your channel..."
+                >{{ creator_profile.bio }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="tone_preference" class="block text-sm font-medium mb-2">Tone Preference</label>
+                    <input
+                        type="text"
+                        id="tone_preference"
+                        name="tone_preference"
+                        value="{{ creator_profile.tone_preference }}"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Educational, Entertaining, Professional"
+                    >
+                </div>
+                <div>
+                    <label for="target_audience" class="block text-sm font-medium mb-2">Target Audience</label>
+                    <input
+                        type="text"
+                        id="target_audience"
+                        name="target_audience"
+                        value="{{ creator_profile.target_audience }}"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Beginner developers, Entrepreneurs"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label for="expertise_areas" class="block text-sm font-medium mb-2">Expertise Areas (comma separated)</label>
+                <input
+                    type="text"
+                    id="expertise_areas"
+                    name="expertise_areas"
+                    value="{{ creator_profile.expertise_areas|join(', ') if creator_profile.expertise_areas else '' }}"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="e.g., Python, AI, Web Development"
+                >
+            </div>
+
+            <div>
+                <label for="additional_notes" class="block text-sm font-medium mb-2">Additional Notes</label>
+                <textarea
+                    id="additional_notes"
+                    name="additional_notes"
+                    rows="2"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="Any other details to help personalize scripts..."
+                >{{ creator_profile.additional_notes }}</textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button
+                    type="submit"
+                    class="px-6 py-2 bg-yt-accent hover:bg-blue-600 rounded-lg font-medium transition-colors"
+                >
+                    Update Profile
+                </button>
+                <button
+                    type="button"
+                    onclick="document.getElementById('profile-form').classList.add('hidden')"
+                    class="px-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+
+        {% else %}
+        <!-- Create New Profile -->
+        <div class="bg-gradient-to-r from-purple-900 to-blue-900 bg-opacity-20 rounded-lg p-6 border border-purple-700 mb-6">
+            <div class="flex items-start space-x-4">
+                <svg class="w-8 h-8 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                </svg>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-purple-400">Create Your Creator Profile</h3>
+                    <p class="text-sm text-yt-text-secondary mt-2">
+                        Set up your creator profile to unlock the Viral Researcher & Scripter. Your profile helps AI generate personalized scripts tailored to your niche and audience.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form
+            class="space-y-4"
+            hx-post="/api/creator-profile"
+            hx-swap="none"
+            hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="creator_name" class="block text-sm font-medium mb-2">Creator Name *</label>
+                    <input
+                        type="text"
+                        id="creator_name"
+                        name="creator_name"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="Your channel or creator name"
+                        required
+                    >
+                </div>
+                <div>
+                    <label for="niche" class="block text-sm font-medium mb-2">Niche *</label>
+                    <input
+                        type="text"
+                        id="niche"
+                        name="niche"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Technology, Finance, Fitness"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label for="bio" class="block text-sm font-medium mb-2">Bio</label>
+                <textarea
+                    id="bio"
+                    name="bio"
+                    rows="3"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="Tell us about your channel and content style..."
+                ></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="tone_preference" class="block text-sm font-medium mb-2">Tone Preference</label>
+                    <input
+                        type="text"
+                        id="tone_preference"
+                        name="tone_preference"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Educational, Entertaining, Professional"
+                    >
+                </div>
+                <div>
+                    <label for="target_audience" class="block text-sm font-medium mb-2">Target Audience</label>
+                    <input
+                        type="text"
+                        id="target_audience"
+                        name="target_audience"
+                        class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                        placeholder="e.g., Beginner developers, Entrepreneurs"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label for="expertise_areas" class="block text-sm font-medium mb-2">Expertise Areas (comma separated)</label>
+                <input
+                    type="text"
+                    id="expertise_areas"
+                    name="expertise_areas"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="e.g., Python, AI, Web Development"
+                >
+            </div>
+
+            <div>
+                <label for="additional_notes" class="block text-sm font-medium mb-2">Additional Notes</label>
+                <textarea
+                    id="additional_notes"
+                    name="additional_notes"
+                    rows="2"
+                    class="w-full px-4 py-2 bg-yt-bg border border-gray-700 rounded-lg focus:border-yt-accent focus:outline-none"
+                    placeholder="Any other details to help personalize scripts for you..."
+                ></textarea>
+            </div>
+
+            <button
+                type="submit"
+                class="px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
+            >
+                Create Creator Profile
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
     <!-- Recent Tests -->
     <div class="bg-yt-card rounded-lg p-6 border border-gray-800">
         <h2 class="text-xl font-bold mb-4">Recent Tests</h2>
