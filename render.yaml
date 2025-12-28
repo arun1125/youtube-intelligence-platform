@@ -27,6 +27,10 @@ services:
       - key: SUPABASE_SECRET_KEY
         sync: false
 
+      # Anthropic (Claude) API
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
       # Google APIs (set these as secret in Render Dashboard)
       - key: GOOGLE_API_KEY
         sync: false
@@ -50,6 +54,16 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false  # You'll get a new one after configuring webhook
+
+      # Research APIs (set these as secret in Render Dashboard)
+      - key: EXA_API_KEY
+        sync: false
+      - key: PERPLEXITY_API_KEY
+        sync: false
+      - key: FIRECRAWL_API_KEY
+        sync: false
+      - key: APIFY_API_KEY
+        sync: false
 
       # Gemini model
       - key: GEMINI_MODEL

@@ -355,3 +355,65 @@ class ProductionShotUpdate(BaseModel):
     music_inspiration: Optional[str] = None
     roll_type: Optional[str] = None
     extra_data: Optional[dict] = None
+
+
+# ============================================
+# 11. HOOK LIBRARY - Saved Hooks for Reuse
+# ============================================
+
+class HookCategory(str, Enum):
+    """Categories for organizing hooks."""
+    CURIOSITY = "curiosity"
+    CONTROVERSY = "controversy"
+    STORY = "story"
+    QUESTION = "question"
+    STATISTIC = "statistic"
+    CHALLENGE = "challenge"
+    PROMISE = "promise"
+    SHOCK = "shock"
+    OTHER = "other"
+
+
+class Hook(BaseModel):
+    """Saved hook for reuse across scripts."""
+    id: UUID4
+    user_id: UUID4
+
+    # Hook content
+    hook_text: str
+    category: HookCategory = HookCategory.OTHER
+
+    # Source tracking
+    source_script_id: Optional[int] = None  # Which script it came from
+    source_video_title: Optional[str] = None  # Original video title
+    source_angle: Optional[str] = None  # Angle that generated it
+
+    # Organization
+    tags: List[str] = Field(default_factory=list)
+    is_favorite: bool = False
+    use_count: int = 0  # Track how many times used
+
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+    class Config:
+        use_enum_values = True
+
+
+class HookCreate(BaseModel):
+    """Schema for creating a new hook."""
+    hook_text: str
+    category: Optional[HookCategory] = HookCategory.OTHER
+    source_script_id: Optional[int] = None
+    source_video_title: Optional[str] = None
+    source_angle: Optional[str] = None
+    tags: Optional[List[str]] = Field(default_factory=list)
+
+
+class HookUpdate(BaseModel):
+    """Schema for updating a hook."""
+    hook_text: Optional[str] = None
+    category: Optional[HookCategory] = None
+    tags: Optional[List[str]] = None
+    is_favorite: Optional[bool] = None

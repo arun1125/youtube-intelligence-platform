@@ -32,16 +32,19 @@ def parse_iso_duration(duration_iso: str) -> int:
     return hours * 3600 + minutes * 60 + seconds
 
 
-def format_duration(seconds: int) -> str:
+def format_duration(seconds: Optional[int]) -> str:
     """
     Format seconds into MM:SS or HH:MM:SS format.
 
     Args:
-        seconds: Duration in seconds
+        seconds: Duration in seconds (can be None for user videos)
 
     Returns:
-        Formatted duration string
+        Formatted duration string, or empty string if None
     """
+    if seconds is None or seconds == 0:
+        return ""
+
     if seconds < 3600:
         minutes, secs = divmod(seconds, 60)
         return f"{minutes}:{secs:02d}"

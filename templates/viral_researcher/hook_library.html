@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Hook Library - Viral Researcher{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="/viral-researcher" class="text-yt-text-secondary hover:text-yt-accent transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold">Hook Library</h1>
+                <p class="text-yt-text-secondary mt-1">Your collection of proven hooks</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar - Categories -->
+        <div class="lg:col-span-1 space-y-4">
+            <!-- Search -->
+            <div class="bg-yt-card rounded-lg p-4 border border-gray-800">
+                <form action="/viral-researcher/hooks" method="GET">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_query or '' }}"
+                            placeholder="Search hooks..."
+                            class="w-full bg-yt-bg border border-gray-700 rounded-lg px-4 py-2 pl-10 text-sm focus:outline-none focus:border-yt-accent"
+                        >
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-yt-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Categories -->
+            <div class="bg-yt-card rounded-lg p-4 border border-gray-800">
+                <h3 class="font-semibold mb-3 text-sm text-yt-text-secondary">CATEGORIES</h3>
+                <div class="space-y-1">
+                    <a
+                        href="/viral-researcher/hooks"
+                        class="flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors {% if not selected_category %}bg-yt-accent bg-opacity-20 text-yt-accent{% else %}hover:bg-gray-800 text-yt-text{% endif %}"
+                    >
+                        <span>All Hooks</span>
+                        <span class="text-xs text-yt-text-secondary">{{ hooks | length }}</span>
+                    </a>
+
+                    {% for cat, count in category_counts.items() %}
+                    <a
+                        href="/viral-researcher/hooks?category={{ cat }}"
+                        class="flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors {% if selected_category == cat %}bg-purple-600 bg-opacity-20 text-purple-400{% else %}hover:bg-gray-800 text-yt-text{% endif %}"
+                    >
+                        <div class="flex items-center space-x-2">
+                            {% if cat == 'curiosity' %}
+                            <span>🔍</span>
+                            {% elif cat == 'controversy' %}
+                            <span>🔥</span>
+                            {% elif cat == 'story' %}
+                            <span>📖</span>
+                            {% elif cat == 'question' %}
+                            <span>❓</span>
+                            {% elif cat == 'statistic' %}
+                            <span>📊</span>
+                            {% elif cat == 'challenge' %}
+                            <span>🎯</span>
+                            {% elif cat == 'promise' %}
+                            <span>✨</span>
+                            {% elif cat == 'shock' %}
+                            <span>😱</span>
+                            {% else %}
+                            <span>📝</span>
+                            {% endif %}
+                            <span class="capitalize">{{ cat }}</span>
+                        </div>
+                        <span class="text-xs text-yt-text-secondary">{{ count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="bg-yt-card rounded-lg p-4 border border-gray-800">
+                <h3 class="font-semibold mb-3 text-sm text-yt-text-secondary">QUICK STATS</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Total Hooks</span>
+                        <span class="font-semibold">{{ hooks | length }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-yt-text-secondary">Categories</span>
+                        <span class="font-semibold">{{ category_counts | length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content - Hooks Grid -->
+        <div class="lg:col-span-3">
+            {% if hooks %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for hook in hooks %}
+                <div class="hook-card bg-yt-card rounded-lg p-5 border border-gray-800 hover:border-purple-500 transition-colors" data-hook-id="{{ hook.id }}">
+                    <!-- Hook Text -->
+                    <p class="text-yt-text mb-4 leading-relaxed">{{ hook.hook_text }}</p>
+
+                    <!-- Meta Info -->
+                    <div class="flex items-center justify-between text-xs text-yt-text-secondary mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-1 bg-purple-900 bg-opacity-30 rounded text-purple-400 capitalize">
+                                {{ hook.category }}
+                            </span>
+                            {% if hook.is_favorite %}
+                            <span class="text-yellow-500">★</span>
+                            {% endif %}
+                        </div>
+                        <span>Used {{ hook.use_count }}x</span>
+                    </div>
+
+                    <!-- Source -->
+                    {% if hook.source_video_title %}
+                    <div class="text-xs text-yt-text-secondary mb-3 truncate">
+                        From: {{ hook.source_video_title }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+                        <div class="flex items-center space-x-2">
+                            <button
+                                onclick="copyHook('{{ hook.hook_text | replace("'", "\\'") | replace('"', '&quot;') }}')"
+                                class="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                                title="Copy hook"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                            <button
+                                onclick="toggleFavorite('{{ hook.id }}')"
+                                class="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                                title="Toggle favorite"
+                            >
+                                <svg class="w-4 h-4 {% if hook.is_favorite %}text-yellow-500 fill-current{% endif %}" fill="{% if hook.is_favorite %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <button
+                            onclick="deleteHook('{{ hook.id }}')"
+                            class="p-2 hover:bg-red-900 hover:bg-opacity-30 rounded-lg transition-colors text-yt-text-secondary hover:text-red-400"
+                            title="Delete hook"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="bg-yt-card rounded-lg p-12 border border-gray-800 text-center">
+                <div class="w-16 h-16 bg-purple-900 bg-opacity-30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">No hooks saved yet</h3>
+                <p class="text-yt-text-secondary mb-6">
+                    {% if search_query %}
+                    No hooks match your search "{{ search_query }}"
+                    {% elif selected_category %}
+                    No hooks in the "{{ selected_category }}" category yet
+                    {% else %}
+                    Start building your hook library by saving hooks from generated scripts
+                    {% endif %}
+                </p>
+                <a
+                    href="/viral-researcher"
+                    class="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
+                >
+                    Generate a Script
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function copyHook(hookText) {
+        navigator.clipboard.writeText(hookText).then(() => {
+            showToast('Hook copied to clipboard!');
+        });
+    }
+
+    async function toggleFavorite(hookId) {
+        try {
+            const response = await fetch(`/viral-researcher/hooks/${hookId}/favorite`, {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Reload to update UI
+                location.reload();
+            }
+        } catch (error) {
+            showToast('Failed to update favorite', true);
+        }
+    }
+
+    async function deleteHook(hookId) {
+        if (!confirm('Are you sure you want to delete this hook?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/viral-researcher/hooks/${hookId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Remove the card from DOM
+                document.querySelector(`[data-hook-id="${hookId}"]`).remove();
+                showToast('Hook deleted');
+            }
+        } catch (error) {
+            showToast('Failed to delete hook', true);
+        }
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+</script>
+{% endblock %}

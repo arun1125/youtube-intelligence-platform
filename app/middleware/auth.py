@@ -8,7 +8,7 @@ from typing import Callable
 import logging
 
 from app.utils.session import is_authenticated, get_access_token
-from app.services.auth_service import auth_service
+from app.features.auth.auth_service import auth_service
 
 logger = logging.getLogger(__name__)
 

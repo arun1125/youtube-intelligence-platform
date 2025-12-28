@@ -8,7 +8,7 @@ from fastapi import Request, Response
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import logging
 
-from app.config import get_settings
+from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -175,5 +175,5 @@ async def get_current_user(request: Request) -> Optional[Dict[str, Any]]:
     if not access_token:
         return None
 
-    from app.services.auth_service import auth_service
+    from app.features.auth.auth_service import auth_service
     return auth_service.get_user_from_token(access_token)

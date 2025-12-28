@@ -6,8 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
 
-from app.config import get_settings
-from app.routes import thumbnail, auth, dashboard, user, payment, shotlist, viral_researcher, creator_profile
+from app.core.config import get_settings
+from app.features.thumbnail import router as thumbnail
+from app.features.auth import router as auth
+from app.features.dashboard import router as dashboard
+from app.features.user import router as user
+from app.features.payment import router as payment
+from app.features.shotlist import router as shotlist
+from app.features.viral_researcher import router as viral_researcher
+from app.features.creator import router as creator_profile
 from app.utils.helpers import format_duration, format_view_count, format_time_ago
 from app.utils.session import get_session_data
 
@@ -77,7 +84,7 @@ async def home(request: Request):
     try:
         session_data = get_session_data(request)
         if session_data:
-            from app.services.supabase_client import supabase_client
+            from app.core.database import supabase_client
             access_token = session_data.get("access_token")
             if access_token:
                 user_response = supabase_client.auth.get_user(access_token)
